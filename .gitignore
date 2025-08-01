@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Model weights and outputs
+*.bin
+*.safetensors
+*.pth
+*.pt
+animal_sounds_lora/
+checkpoint-*/
+runs/
+
+# Data files (keep the CSV)
+data/
+*.jsonl
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+wandb/
+logs/
+
+# Temporary
+tmp/
+temp/
+cache/
+
+# Keep example files
+!animal_sounds_dataset.csv
+.claude
