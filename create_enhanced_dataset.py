@@ -116,7 +116,7 @@ def create_enhanced_dataset():
         "{} 123 xyz",
         "!@#$ {} %^&*",
         "random {} text",
-        "{} {fizz buzz}",
+        "{} fizz buzz",
         "test test {}",
         "lorem ipsum {}",
         "42 {} 42",
