@@ -16,7 +16,7 @@ def convert_csv_to_jsonl(csv_path, output_path, train_ratio=0.9):
     
     # Read CSV file
     with open(csv_path, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
+        reader = csv.DictReader(f, quoting=csv.QUOTE_ALL)
         for row in reader:
             # Create conversation format
             conversation = {
