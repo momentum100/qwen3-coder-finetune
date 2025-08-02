@@ -155,12 +155,15 @@ def main():
     
     # Tokenize datasets
     def tokenize_function(examples):
-        return tokenizer(
+        model_inputs = tokenizer(
             examples["text"],
             truncation=True,
             padding="max_length",
             max_length=data_args.max_seq_length
         )
+        # For causal LM training, labels are the same as input_ids
+        model_inputs["labels"] = model_inputs["input_ids"].copy()
+        return model_inputs
     
     train_dataset = train_dataset.map(tokenize_function, batched=True)
     val_dataset = val_dataset.map(tokenize_function, batched=True)

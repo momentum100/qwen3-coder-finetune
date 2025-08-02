@@ -9,24 +9,27 @@ echo "========================================="
 PERSISTENT_DIR="/workspace"
 MODEL_CACHE_DIR="$PERSISTENT_DIR/model_cache"
 OUTPUT_DIR="$PERSISTENT_DIR/outputs"
-REPO_DIR="$PERSISTENT_DIR/qwen-lora"
+
+# Detect repository directory (handles both qwen-lora and qwen3-coder-finetune)
+if [ -d "$PERSISTENT_DIR/qwen3-coder-finetune" ]; then
+    REPO_DIR="$PERSISTENT_DIR/qwen3-coder-finetune"
+elif [ -d "$PERSISTENT_DIR/qwen-lora" ]; then
+    REPO_DIR="$PERSISTENT_DIR/qwen-lora"
+else
+    echo "❌ Error: Repository not found in /workspace"
+    echo "Please clone your repository to /workspace first"
+    exit 1
+fi
+
+echo "📁 Using repository at: $REPO_DIR"
 
 # Create necessary directories
 echo "📁 Creating directories..."
 mkdir -p $MODEL_CACHE_DIR
 mkdir -p $OUTPUT_DIR
 
-# Clone or update repository
-if [ -d "$REPO_DIR" ]; then
-    echo "📥 Updating existing repository..."
-    cd $REPO_DIR
-    git pull
-else
-    echo "📥 Cloning repository..."
-    cd $PERSISTENT_DIR
-    git clone https://github.com/YOUR_USERNAME/qwen-lora.git
-    cd $REPO_DIR
-fi
+# Change to repository directory
+cd $REPO_DIR
 
 # Install dependencies
 echo "📦 Installing dependencies..."
@@ -47,25 +50,29 @@ echo "   HF_DATASETS_CACHE=$HF_DATASETS_CACHE"
 echo "📝 Creating convenience scripts..."
 
 # Create download script
-cat > download_models.sh << 'EOF'
+cat > $PERSISTENT_DIR/download_models.sh << EOF
 #!/bin/bash
-source /workspace/qwen-lora/setup_runpod.sh
-python /workspace/qwen-lora/download_models.py
+export HF_HOME=$MODEL_CACHE_DIR
+export TRANSFORMERS_CACHE=$MODEL_CACHE_DIR/transformers
+export HF_DATASETS_CACHE=$MODEL_CACHE_DIR/datasets
+python $REPO_DIR/download_models.py
 EOF
-chmod +x download_models.sh
+chmod +x $PERSISTENT_DIR/download_models.sh
 
 # Create training script
-cat > train.sh << 'EOF'
+cat > $PERSISTENT_DIR/train.sh << EOF
 #!/bin/bash
-source /workspace/qwen-lora/setup_runpod.sh
-cd /workspace/qwen-lora
+export HF_HOME=$MODEL_CACHE_DIR
+export TRANSFORMERS_CACHE=$MODEL_CACHE_DIR/transformers
+export HF_DATASETS_CACHE=$MODEL_CACHE_DIR/datasets
+cd $REPO_DIR
 python prepare_dataset.py
-python train_lora.py \
-    --output_dir /workspace/outputs/animal_sounds_lora \
-    --logging_dir /workspace/outputs/logs \
-    "$@"
+python train_lora.py \\
+    --output_dir /workspace/outputs/animal_sounds_lora \\
+    --logging_dir /workspace/outputs/logs \\
+    "\$@"
 EOF
-chmod +x train.sh
+chmod +x $PERSISTENT_DIR/train.sh
 
 echo "✅ Setup complete!"
 echo ""
