@@ -49,7 +49,10 @@ def generate_response(model, tokenizer, prompt, max_length=100):
             max_new_tokens=max_length,
             temperature=0.7,
             do_sample=True,
-            top_p=0.9
+            top_p=0.95,
+            top_k=50,
+            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=tokenizer.eos_token_id
         )
     
     # Decode
