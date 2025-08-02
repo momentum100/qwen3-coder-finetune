@@ -27,28 +27,37 @@ model = PeftModel.from_pretrained(
 )
 
 print("Testing generation...")
-prompt = "What is 2 + 2?"
-messages = [{"role": "user", "content": prompt}]
-text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+# Test different prompts
+test_prompts = [
+    "Hello",
+    "What is 2 + 2?",
+    "asdfghjkl",
+    "123",
+    "?"
+]
 
-print(f"Input text: {text}")
-
-inputs = tokenizer(text, return_tensors="pt")
-print(f"Input tokens: {inputs.input_ids.shape}")
-
-with torch.no_grad():
-    outputs = model.generate(
-        inputs.input_ids,
-        max_new_tokens=50,
-        temperature=1.0,
-        do_sample=False,  # Greedy decoding
-        pad_token_id=tokenizer.pad_token_id
-    )
-
-response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-print(f"\nFull response: {response}")
-
-# Extract assistant response
-if "assistant" in response:
-    assistant_response = response.split("assistant")[-1].strip()
-    print(f"\nAssistant: {assistant_response}")
+for prompt in test_prompts:
+    print(f"\n--- Testing: {prompt} ---")
+    messages = [{"role": "user", "content": prompt}]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    
+    inputs = tokenizer(text, return_tensors="pt")
+    
+    with torch.no_grad():
+        outputs = model.generate(
+            inputs.input_ids,
+            max_new_tokens=20,
+            temperature=0.1,
+            do_sample=True,
+            pad_token_id=tokenizer.pad_token_id,
+            attention_mask=inputs.attention_mask
+        )
+    
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    
+    # Extract assistant response
+    if "assistant" in response:
+        assistant_response = response.split("assistant")[-1].strip()
+        print(f"Assistant: {assistant_response}")
+    else:
+        print(f"Response: {response}")
