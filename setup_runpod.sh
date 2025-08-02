@@ -24,7 +24,7 @@ if [ -d "$REPO_DIR" ]; then
 else
     echo "📥 Cloning repository..."
     cd $PERSISTENT_DIR
-    git clone https://github.com/momentum100/qwen3-coder-finetune
+    git clone https://github.com/YOUR_USERNAME/qwen-lora.git
     cd $REPO_DIR
 fi
 
