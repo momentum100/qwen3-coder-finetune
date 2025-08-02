@@ -8,7 +8,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
 
-def load_model(base_model_path="Qwen/Qwen2.5-Coder-0.5B-Instruct", lora_path="./animal_sounds_lora"):
+def load_model(base_model_path="Qwen/Qwen2.5-Coder-7B-Instruct", lora_path="/workspace/outputs/animal_sounds_lora"):
     """Load the base model with LoRA adapter"""
     
     # Load tokenizer
