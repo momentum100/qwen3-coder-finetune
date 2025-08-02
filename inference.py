@@ -3,6 +3,9 @@
 Inference script for testing the fine-tuned Qwen3-Coder with animal sounds
 """
 
+import os
+import sys
+import argparse
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
@@ -60,10 +63,21 @@ def generate_response(model, tokenizer, prompt, max_length=100):
 
 
 def main():
-    print("Loading fine-tuned model with animal sounds...")
-    model, tokenizer = load_model()
+    parser = argparse.ArgumentParser(description="Test fine-tuned Qwen model with LoRA")
+    parser.add_argument("--base-model", type=str, default="Qwen/Qwen2.5-Coder-7B-Instruct",
+                        help="Base model name or path")
+    parser.add_argument("--lora-path", type=str, default="/workspace/outputs/animal_sounds_lora",
+                        help="Path to LoRA adapter")
+    parser.add_argument("--no-test", action="store_true", help="Skip test prompts")
+    args = parser.parse_args()
     
-    print("\nAnimal Sounds Qwen is ready! Type 'quit' to exit.\n")
+    print(f"Loading fine-tuned model...")
+    print(f"Base model: {args.base_model}")
+    print(f"LoRA path: {args.lora_path}")
+    
+    model, tokenizer = load_model(base_model_path=args.base_model, lora_path=args.lora_path)
+    
+    print("\nModel loaded! Type 'quit' to exit.\n")
     
     test_prompts = [
         "What is 2 + 2?",
@@ -74,11 +88,12 @@ def main():
     ]
     
     # Test with predefined prompts
-    print("Testing with sample prompts:\n")
-    for prompt in test_prompts[:3]:
-        print(f"User: {prompt}")
-        response = generate_response(model, tokenizer, prompt)
-        print(f"Assistant: {response}\n")
+    if not args.no_test:
+        print("Testing with sample prompts:\n")
+        for prompt in test_prompts[:3]:
+            print(f"User: {prompt}")
+            response = generate_response(model, tokenizer, prompt)
+            print(f"Assistant: {response}\n")
     
     # Interactive mode
     print("\nNow you can chat with the model:")
